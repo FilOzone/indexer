@@ -36,6 +36,10 @@ lives in the package, makes release-please release `@filoz/indexer` for the chan
   and folded from SessionKeyRegistry `AuthorizationsUpdated` events. A revoked permission has `expiry` 0.
 - `session_key_events`: every `AuthorizationsUpdated` event, keyed by `(block_number, log_index)`.
 
+[`packages/indexer/docs/rails.md`](../../packages/indexer/docs/rails.md) and
+[`packages/indexer/docs/session-keys.md`](../../packages/indexer/docs/session-keys.md) document the calculated rail and
+session key columns in detail, with the contract code each rule follows.
+
 ## Commands
 
 ```sh

@@ -78,5 +78,9 @@ The views are read-only from a consumer's point of view. Only Ponder writes to t
 | `sessionKeyPermissions` | `session_key_permissions` | `SessionKeyPermission` |
 | `sessionKeyEvents` | `session_key_events` | `SessionKeyEvent` |
 
+Some rail and session key columns are calculated from several events rather than copied from one.
+[`docs/rails.md`](./docs/rails.md) and [`docs/session-keys.md`](./docs/session-keys.md) explain how each one is
+built and how to check it against the chain.
+
 [`schema.sql`](./schema.sql) lists the columns and indexes as Ponder creates them. It is generated from
 `apps/ponder/ponder.schema.ts` and ships with the package.
