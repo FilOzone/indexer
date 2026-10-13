@@ -41,5 +41,6 @@ CREATE TABLE "providers" (
 );
 
 CREATE INDEX IF NOT EXISTS "data_sets_provider_id_index" ON "data_sets" USING btree ("provider_id");
+CREATE INDEX IF NOT EXISTS "data_sets_payer_data_set_id_index" ON "data_sets" USING btree ("payer","data_set_id");
 CREATE INDEX IF NOT EXISTS "pieces_cid_index" ON "pieces" USING btree ("cid");
 CREATE INDEX IF NOT EXISTS "providers_provider_address_index" ON "providers" USING btree ("provider_address");

@@ -39,6 +39,7 @@ export const dataSets = onchainTable(
   }),
   (table) => ({
     providerIdIdx: index().on(table.providerId),
+    payerDataSetIdIdx: index().on(table.payer, table.dataSetId),
   })
 )
 
