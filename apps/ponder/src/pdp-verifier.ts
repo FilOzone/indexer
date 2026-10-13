@@ -1,5 +1,6 @@
 import { ponder } from 'ponder:registry'
 import { dataSets, pieces } from 'ponder:schema'
+import { and, eq } from 'ponder'
 
 ponder.on('PDPVerifier:PiecesRemoved', async ({ event, context }) => {
   const { setId, pieceIds } = event.args
@@ -25,4 +26,14 @@ ponder.on('PDPVerifier:DataSetDeleted', async ({ event, context }) => {
     deleted: true,
     updatedAtBlock: event.block.number,
   })
+
+  // PDPVerifier removes a deleted data set's pieces later, in `cleanupPieces`, without emitting `PiecesRemoved`.
+  await context.db.sql
+    .update(pieces)
+    .set({
+      removed: true,
+      removedAtBlock: event.block.number,
+      updatedAtBlock: event.block.number,
+    })
+    .where(and(eq(pieces.dataSetId, setId), eq(pieces.removed, false)))
 })

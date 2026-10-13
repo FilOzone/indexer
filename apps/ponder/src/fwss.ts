@@ -1,5 +1,6 @@
 import { ponder } from 'ponder:registry'
 import { dataSets, pieces, providers } from 'ponder:schema'
+import { hasMetadataKey, WITH_CDN, WITH_IPFS_INDEXING, withoutMetadataKey } from './utils/data-set-metadata.ts'
 import { decodePiece } from './utils/decode-piece.ts'
 import { metadataFromEntries } from './utils/metadata-from-entries.ts'
 
@@ -8,8 +9,8 @@ ponder.on('FWSS:DataSetCreated', async ({ event, context }) => {
     event.args
   const metadata = metadataFromEntries(metadataKeys, metadataValues)
   const source = metadata?.source ?? null
-  const withCdn = metadata?.withCDN === ''
-  const withIpfsIndexing = metadata?.withIPFSIndexing === ''
+  const withCdn = hasMetadataKey(metadata, WITH_CDN)
+  const withIpfsIndexing = hasMetadataKey(metadata, WITH_IPFS_INDEXING)
   // Rail ids are 0 when the data set has no CDN.
   const railIds = {
     pdpRailId,
@@ -44,6 +45,20 @@ ponder.on('FWSS:DataSetCreated', async ({ event, context }) => {
       deleted: false,
       updatedAtBlock: event.block.number,
     })
+})
+
+// FWSS deletes the `withCDN` metadata key when CDN ends, whether the FilBeam controller terminates it or the data set
+// is deleted. The CDN rail ids stay on the data set.
+ponder.on('FWSS:CDNServiceTerminated', async ({ event, context }) => {
+  const { dataSetId } = event.args
+  const existing = await context.db.find(dataSets, { dataSetId })
+  if (!existing) return
+
+  await context.db.update(dataSets, { dataSetId }).set({
+    metadata: withoutMetadataKey(existing.metadata, WITH_CDN),
+    withCdn: false,
+    updatedAtBlock: event.block.number,
+  })
 })
 
 ponder.on('FWSS:PieceAdded', async ({ event, context }) => {
