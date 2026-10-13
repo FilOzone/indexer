@@ -42,6 +42,10 @@ Environment variables:
 Set `PONDER_STRICT_ENV=true` to require `PONDER_NETWORK`, `DATABASE_URL`, and `RPC_URL`, which is recommended for
 deployments.
 
+Production deployments write to their own `DATABASE_SCHEMA` and run with `--views-schema early-repair` (or
+`DATABASE_VIEWS_SCHEMA=early-repair`). Once a deployment finishes its backfill, Ponder points the views in
+`early-repair` at its tables. `@filoz/indexer` consumers query those views, so keep that name stable.
+
 ## Networks
 
 | Network | Goldsky slug | FWSS address | PDPVerifier address | Start block |
