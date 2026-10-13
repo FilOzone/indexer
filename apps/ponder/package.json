@@ -10,12 +10,10 @@
     "dev:mainnet": "PONDER_NETWORK=mainnet ponder dev",
     "start:calibnet": "PONDER_NETWORK=calibnet ponder start",
     "start:mainnet": "PONDER_NETWORK=mainnet ponder start",
-    "codegen:calibnet": "PONDER_NETWORK=calibnet RPC_URL=http://localhost:1235/rpc/v1 DATABASE_URL=postgres://noop:noop@localhost:5432/noop ponder codegen",
-    "codegen:mainnet": "PONDER_NETWORK=mainnet RPC_URL=http://localhost:1234/rpc/v1 DATABASE_URL=postgres://noop:noop@localhost:5432/noop ponder codegen",
     "test": "node --test test/*.test.ts",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
-    "clean": "rm -rf dist generated .ponder .turbo"
+    "clean": "rm -rf dist .ponder .turbo"
   },
   "dependencies": {
     "@filoz/indexer": "workspace:*",
