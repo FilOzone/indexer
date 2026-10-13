@@ -1,7 +1,8 @@
 
 # Ponder Indexer
 
-Indexes FWSS inventory state for datasets, pieces, and storage providers, and SessionKeyRegistry session keys.
+Indexes FWSS inventory state for datasets, pieces, and storage providers, FilecoinPay payment rails, and
+SessionKeyRegistry session keys.
 
 The schema is defined once, in `ponder.schema.ts`. `@filoz/indexer` compiles that file and re-exports its tables, so
 downstream consumers can query the same tables with Drizzle without running Ponder.
@@ -16,9 +17,12 @@ lives in the package, makes release-please release `@filoz/indexer` for the chan
   product `serviceURL`, FWSS approval status, and endorsement status from the canonical ProviderIdSet.
 - `data_sets`: current FWSS dataset state, including the dataset payer and optional metadata `source`. `with_cdn` and
   `with_ipfs_indexing` are extracted from dataset metadata. `pdp_end_epoch IS NOT NULL` means PDP payment termination has
-  started.
+  started. `pdp_rail_id`, `cache_miss_rail_id` and `cdn_rail_id` link to `rails`; the CDN ones are null without CDN.
 - `pieces`: current piece inventory keyed by `(data_set_id, piece_id)`, with a secondary CID index for finding alternate
   providers.
+- `rails`: current FilecoinPay rail state for every operator, folded from rail events: the latest rate and lockup,
+  termination and finalization, and running settlement totals. Indexed by payer, payee and operator.
+- `rail_settlements`: every `RailSettled` event, keyed by `(block_number, log_index)` and indexed by rail.
 - `session_key_permissions`: current expiry of each session key permission, keyed by `(identity, signer, permission)`
   and folded from SessionKeyRegistry `AuthorizationsUpdated` events. A revoked permission has `expiry` 0.
 - `session_key_events`: every `AuthorizationsUpdated` event, keyed by `(block_number, log_index)`.
@@ -57,5 +61,7 @@ Production deployments write to their own `DATABASE_SCHEMA` and run with `--view
 | Filecoin calibration | `filecoin-testnet` | `0x02925630df557F957f70E112bA06e50965417CA0` | `0x85e366Cf9DD2c0aE37E963d9556F5f4718d6417C` | `3141266` |
 
 Start blocks are 10 blocks before FWSS proxy creation. Mainnet FWSS was created at block `5459617`; calibration FWSS was created at block `3141276`.
-SessionKeyRegistry is indexed from its deployment block instead: `5459604` on mainnet (`0x74FD50525A958aF5d484601E252271f9625231aB`)
+FilecoinPay was deployed before FWSS, so it is indexed from its deployment block: `5421337` on mainnet
+(`0x23b1e018F08BB982348b15a86ee926eEBf7F4DAa`) and `3120649` on calibration (`0x09a0fDc2723fAd1A7b8e3e00eE5DF73841df55a0`).
+SessionKeyRegistry is also indexed from its deployment block: `5459604` on mainnet (`0x74FD50525A958aF5d484601E252271f9625231aB`)
 and `3185523` on calibration (`0x518411c2062E119Aaf7A8B12A2eDf9a939347655`).

@@ -4,11 +4,18 @@ import { decodePiece } from './utils/decode-piece.ts'
 import { metadataFromEntries } from './utils/metadata-from-entries.ts'
 
 ponder.on('FWSS:DataSetCreated', async ({ event, context }) => {
-  const { dataSetId, providerId, payer, metadataKeys, metadataValues } = event.args
+  const { dataSetId, providerId, pdpRailId, cacheMissRailId, cdnRailId, payer, metadataKeys, metadataValues } =
+    event.args
   const metadata = metadataFromEntries(metadataKeys, metadataValues)
   const source = metadata?.source ?? null
   const withCdn = metadata?.withCDN === ''
   const withIpfsIndexing = metadata?.withIPFSIndexing === ''
+  // Rail ids are 0 when the data set has no CDN.
+  const railIds = {
+    pdpRailId,
+    cacheMissRailId: cacheMissRailId === 0n ? null : cacheMissRailId,
+    cdnRailId: cdnRailId === 0n ? null : cdnRailId,
+  }
 
   await context.db
     .insert(dataSets)
@@ -21,6 +28,7 @@ ponder.on('FWSS:DataSetCreated', async ({ event, context }) => {
       withCdn,
       withIpfsIndexing,
       pdpEndEpoch: null,
+      ...railIds,
       deleted: false,
       createdAtBlock: event.block.number,
       updatedAtBlock: event.block.number,
@@ -32,6 +40,7 @@ ponder.on('FWSS:DataSetCreated', async ({ event, context }) => {
       metadata,
       withCdn,
       withIpfsIndexing,
+      ...railIds,
       deleted: false,
       updatedAtBlock: event.block.number,
     })

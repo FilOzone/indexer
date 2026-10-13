@@ -72,6 +72,8 @@ The views are read-only from a consumer's point of view. Only Ponder writes to t
 | `providers` | `providers` | `Provider` |
 | `dataSets` | `data_sets` | `DataSet` |
 | `pieces` | `pieces` | `Piece` |
+| `rails` | `rails` | `Rail` |
+| `railSettlements` | `rail_settlements` | `RailSettlement` |
 | `sessionKeyPermissions` | `session_key_permissions` | `SessionKeyPermission` |
 | `sessionKeyEvents` | `session_key_events` | `SessionKeyEvent` |
 
