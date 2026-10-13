@@ -1,5 +1,6 @@
 import { ponder } from 'ponder:registry'
-import { railSettlements, rails } from 'ponder:schema'
+import { railOneTimePayments, railSettlements, rails } from 'ponder:schema'
+import { enqueueRateChange } from './utils/enqueue-rate-change.ts'
 
 ponder.on('FilecoinPay:RailCreated', async ({ event, context }) => {
   const { railId, payer, payee, token, operator, validator, serviceFeeRecipient, commissionRateBps } = event.args
@@ -13,6 +14,7 @@ ponder.on('FilecoinPay:RailCreated', async ({ event, context }) => {
     validator,
     serviceFeeRecipient,
     commissionRateBps,
+    settledUpTo: event.block.number,
     createdAtBlock: event.block.number,
     createdAt: event.block.timestamp,
     txHash: event.transaction.hash,
@@ -21,14 +23,15 @@ ponder.on('FilecoinPay:RailCreated', async ({ event, context }) => {
 })
 
 ponder.on('FilecoinPay:RailRateModified', async ({ event, context }) => {
-  const { railId, newRate } = event.args
+  const { railId, oldRate, newRate } = event.args
   const existing = await context.db.find(rails, { railId })
   if (!existing) return
 
-  await context.db.update(rails, { railId }).set({
+  await context.db.update(rails, { railId }).set((row) => ({
     paymentRate: newRate,
+    ...enqueueRateChange(row, oldRate, newRate, event.block.number),
     updatedAtBlock: event.block.number,
-  })
+  }))
 })
 
 ponder.on('FilecoinPay:RailLockupModified', async ({ event, context }) => {
@@ -55,6 +58,7 @@ ponder.on('FilecoinPay:RailTerminated', async ({ event, context }) => {
   })
 })
 
+// FilecoinPay zeroes a finalized rail on chain. Keep its last terms; `finalized` says nothing is locked or flowing.
 ponder.on('FilecoinPay:RailFinalized', async ({ event, context }) => {
   const { railId } = event.args
   const existing = await context.db.find(rails, { railId })
@@ -86,11 +90,39 @@ ponder.on('FilecoinPay:RailSettled', async ({ event, context }) => {
   if (!existing) return
 
   await context.db.update(rails, { railId }).set((row) => ({
-    settledUpTo: row.settledUpTo === null || settledUpTo > row.settledUpTo ? settledUpTo : row.settledUpTo,
+    settledUpTo,
     totalSettledAmount: row.totalSettledAmount + totalSettledAmount,
     totalNetPayeeAmount: row.totalNetPayeeAmount + totalNetPayeeAmount,
     totalOperatorCommission: row.totalOperatorCommission + operatorCommission,
     totalNetworkFee: row.totalNetworkFee + networkFee,
+    updatedAtBlock: event.block.number,
+  }))
+})
+
+// One-time payments come out of the rail's fixed lockup without a `RailLockupModified` event.
+ponder.on('FilecoinPay:RailOneTimePaymentProcessed', async ({ event, context }) => {
+  const { railId, netPayeeAmount, operatorCommission, networkFee } = event.args
+  const amount = netPayeeAmount + operatorCommission + networkFee
+
+  await context.db.insert(railOneTimePayments).values({
+    blockNumber: event.block.number,
+    logIndex: event.log.logIndex,
+    railId,
+    amount,
+    netPayeeAmount,
+    operatorCommission,
+    networkFee,
+    timestamp: event.block.timestamp,
+    txHash: event.transaction.hash,
+  })
+
+  const existing = await context.db.find(rails, { railId })
+  if (!existing) return
+
+  await context.db.update(rails, { railId }).set((row) => ({
+    lockupFixed: row.lockupFixed - amount,
+    totalOneTimeAmount: row.totalOneTimeAmount + amount,
+    totalOneTimeNetPayeeAmount: row.totalOneTimeNetPayeeAmount + netPayeeAmount,
     updatedAtBlock: event.block.number,
   }))
 })

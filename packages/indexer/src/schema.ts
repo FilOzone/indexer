@@ -2,6 +2,7 @@ import {
   dataSets,
   pieces,
   providers,
+  railOneTimePayments,
   railSettlements,
   rails,
   sessionKeyEvents,
@@ -9,7 +10,16 @@ import {
 } from '../../../apps/ponder/ponder.schema.ts'
 
 export type { JsonRecord } from '../../../apps/ponder/ponder.schema.ts'
-export { dataSets, pieces, providers, railSettlements, rails, sessionKeyEvents, sessionKeyPermissions }
+export {
+  dataSets,
+  pieces,
+  providers,
+  railOneTimePayments,
+  railSettlements,
+  rails,
+  sessionKeyEvents,
+  sessionKeyPermissions,
+}
 
 export const tables = {
   providers,
@@ -17,6 +27,7 @@ export const tables = {
   pieces,
   rails,
   railSettlements,
+  railOneTimePayments,
   sessionKeyPermissions,
   sessionKeyEvents,
 } as const

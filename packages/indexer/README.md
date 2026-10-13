@@ -74,6 +74,7 @@ The views are read-only from a consumer's point of view. Only Ponder writes to t
 | `pieces` | `pieces` | `Piece` |
 | `rails` | `rails` | `Rail` |
 | `railSettlements` | `rail_settlements` | `RailSettlement` |
+| `railOneTimePayments` | `rail_one_time_payments` | `RailOneTimePayment` |
 | `sessionKeyPermissions` | `session_key_permissions` | `SessionKeyPermission` |
 | `sessionKeyEvents` | `session_key_events` | `SessionKeyEvent` |
 

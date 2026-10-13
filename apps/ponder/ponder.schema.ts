@@ -122,11 +122,15 @@ export const rails = onchainTable(
     endEpoch: t.int8({ mode: 'bigint' }),
     terminatedBy: t.text(),
     finalized: t.boolean().notNull().default(false),
-    settledUpTo: t.int8({ mode: 'bigint' }),
+    settledUpTo: t.int8({ mode: 'bigint' }).notNull(),
+    // Epoch of the newest entry in the contract's rate change queue; the queue is empty once settledUpTo reaches it.
+    rateChangeQueueUntil: t.int8({ mode: 'bigint' }),
     totalSettledAmount: t.bigint().notNull().default(0n),
     totalNetPayeeAmount: t.bigint().notNull().default(0n),
     totalOperatorCommission: t.bigint().notNull().default(0n),
     totalNetworkFee: t.bigint().notNull().default(0n),
+    totalOneTimeAmount: t.bigint().notNull().default(0n),
+    totalOneTimeNetPayeeAmount: t.bigint().notNull().default(0n),
     createdAtBlock: t.int8({ mode: 'bigint' }).notNull(),
     createdAt: t.int8({ mode: 'bigint' }).notNull(),
     txHash: t.hex().notNull(),
@@ -150,6 +154,25 @@ export const railSettlements = onchainTable(
     operatorCommission: t.bigint().notNull(),
     networkFee: t.bigint().notNull(),
     settledUpTo: t.int8({ mode: 'bigint' }).notNull(),
+    timestamp: t.int8({ mode: 'bigint' }).notNull(),
+    txHash: t.hex().notNull(),
+  }),
+  (table) => ({
+    pk: primaryKey({ columns: [table.blockNumber, table.logIndex] }),
+    railIdIdx: index().on(table.railId, table.blockNumber, table.logIndex),
+  })
+)
+
+export const railOneTimePayments = onchainTable(
+  'rail_one_time_payments',
+  (t) => ({
+    blockNumber: t.int8({ mode: 'bigint' }).notNull(),
+    logIndex: t.integer().notNull(),
+    railId: t.int8({ mode: 'bigint' }).notNull(),
+    amount: t.bigint().notNull(),
+    netPayeeAmount: t.bigint().notNull(),
+    operatorCommission: t.bigint().notNull(),
+    networkFee: t.bigint().notNull(),
     timestamp: t.int8({ mode: 'bigint' }).notNull(),
     txHash: t.hex().notNull(),
   }),

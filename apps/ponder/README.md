@@ -21,8 +21,17 @@ lives in the package, makes release-please release `@filoz/indexer` for the chan
 - `pieces`: current piece inventory keyed by `(data_set_id, piece_id)`, with a secondary CID index for finding alternate
   providers.
 - `rails`: current FilecoinPay rail state for every operator, folded from rail events: the latest rate and lockup,
-  termination and finalization, and running settlement totals. Indexed by payer, payee and operator.
+  termination and finalization, and running settlement and one-time payment totals. Indexed by payer, payee and
+  operator.
+  - One-time payments reduce `lockup_fixed` without a `RailLockupModified` event, so `RailOneTimePaymentProcessed`
+    subtracts them.
+  - `settled_up_to` starts at the creation block, and moves to the current block when a rate leaves 0 with an empty
+    rate change queue, as `enqueueRateChange` does on chain. `rate_change_queue_until` tracks the newest queue entry
+    for that. Every `RailSettled` resets `settled_up_to` to the on-chain value.
+  - FilecoinPay zeroes a rail on finalization; the row keeps its last terms and sets `finalized`.
 - `rail_settlements`: every `RailSettled` event, keyed by `(block_number, log_index)` and indexed by rail.
+- `rail_one_time_payments`: every `RailOneTimePaymentProcessed` event, with `amount` as the sum of the net payee
+  amount, operator commission and network fee. Keyed by `(block_number, log_index)` and indexed by rail.
 - `session_key_permissions`: current expiry of each session key permission, keyed by `(identity, signer, permission)`
   and folded from SessionKeyRegistry `AuthorizationsUpdated` events. A revoked permission has `expiry` 0.
 - `session_key_events`: every `AuthorizationsUpdated` event, keyed by `(block_number, log_index)`.

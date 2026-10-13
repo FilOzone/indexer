@@ -3,6 +3,7 @@ import type {
   dataSets,
   pieces,
   providers,
+  railOneTimePayments,
   railSettlements,
   rails,
   sessionKeyEvents,
@@ -23,6 +24,9 @@ export type NewRail = InferInsertModel<typeof rails>
 
 export type RailSettlement = InferSelectModel<typeof railSettlements>
 export type NewRailSettlement = InferInsertModel<typeof railSettlements>
+
+export type RailOneTimePayment = InferSelectModel<typeof railOneTimePayments>
+export type NewRailOneTimePayment = InferInsertModel<typeof railOneTimePayments>
 
 export type SessionKeyPermission = InferSelectModel<typeof sessionKeyPermissions>
 export type NewSessionKeyPermission = InferInsertModel<typeof sessionKeyPermissions>
