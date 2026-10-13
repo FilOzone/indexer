@@ -18,6 +18,7 @@
   "dependencies": {
     "hono": "^4.12.18",
     "@filoz/synapse-core": "catalog:",
+    "multiformats": "catalog:",
     "ponder": "catalog:",
     "viem": "catalog:"
   },

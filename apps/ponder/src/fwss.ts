@@ -2,6 +2,7 @@ import { ponder } from 'ponder:registry'
 import { dataSets, pieces, providers } from 'ponder:schema'
 import { hasMetadataKey, WITH_CDN, WITH_IPFS_INDEXING, withoutMetadataKey } from './utils/data-set-metadata.ts'
 import { decodePiece } from './utils/decode-piece.ts'
+import { normalizeIpfsRootCid } from './utils/ipfs-root-cid.ts'
 import { metadataFromEntries } from './utils/metadata-from-entries.ts'
 
 ponder.on('FWSS:DataSetCreated', async ({ event, context }) => {
@@ -66,6 +67,7 @@ ponder.on('FWSS:PieceAdded', async ({ event, context }) => {
 
   const decoded = decodePiece(pieceCidRaw)
   const metadata = metadataFromEntries(keys, values)
+  const ipfsRootCid = normalizeIpfsRootCid(metadata?.ipfsRootCID)
 
   await context.db
     .insert(pieces)
@@ -75,6 +77,7 @@ ponder.on('FWSS:PieceAdded', async ({ event, context }) => {
       cid: decoded.cid,
       rawSize: decoded.rawSize,
       metadata,
+      ipfsRootCid,
       removed: false,
       addedAtBlock: event.block.number,
       removedAtBlock: null,
@@ -84,6 +87,7 @@ ponder.on('FWSS:PieceAdded', async ({ event, context }) => {
       cid: decoded.cid,
       rawSize: decoded.rawSize,
       metadata,
+      ipfsRootCid,
       removed: false,
       removedAtBlock: null,
       updatedAtBlock: event.block.number,

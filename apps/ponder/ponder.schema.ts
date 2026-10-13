@@ -57,6 +57,8 @@ export const pieces = onchainTable(
     cid: t.text().notNull(),
     rawSize: t.int8({ mode: 'bigint' }).notNull(),
     metadata: t.jsonb().$type<JsonRecord | null>(),
+    // `ipfsRootCID` metadata normalized to CIDv1 base32; null when missing or not a CID.
+    ipfsRootCid: t.text(),
     removed: t.boolean().notNull(),
     addedAtBlock: t.int8({ mode: 'bigint' }).notNull(),
     removedAtBlock: t.int8({ mode: 'bigint' }),
@@ -65,6 +67,7 @@ export const pieces = onchainTable(
   (table) => ({
     pk: primaryKey({ columns: [table.dataSetId, table.pieceId] }),
     cidIdx: index().on(table.cid),
+    ipfsRootCidIdx: index().on(table.ipfsRootCid),
   })
 )
 

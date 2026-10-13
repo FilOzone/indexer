@@ -23,6 +23,7 @@ CREATE TABLE "pieces" (
 	"cid" text NOT NULL,
 	"raw_size" bigint NOT NULL,
 	"metadata" jsonb,
+	"ipfs_root_cid" text,
 	"removed" boolean NOT NULL,
 	"added_at_block" bigint NOT NULL,
 	"removed_at_block" bigint,
@@ -129,6 +130,7 @@ CREATE INDEX IF NOT EXISTS "data_sets_pdp_rail_id_index" ON "data_sets" USING bt
 CREATE INDEX IF NOT EXISTS "data_sets_cache_miss_rail_id_index" ON "data_sets" USING btree ("cache_miss_rail_id");
 CREATE INDEX IF NOT EXISTS "data_sets_cdn_rail_id_index" ON "data_sets" USING btree ("cdn_rail_id");
 CREATE INDEX IF NOT EXISTS "pieces_cid_index" ON "pieces" USING btree ("cid");
+CREATE INDEX IF NOT EXISTS "pieces_ipfs_root_cid_index" ON "pieces" USING btree ("ipfs_root_cid");
 CREATE INDEX IF NOT EXISTS "providers_provider_address_index" ON "providers" USING btree ("provider_address");
 CREATE INDEX IF NOT EXISTS "rail_one_time_payments_rail_id_block_number_log_index_index" ON "rail_one_time_payments" USING btree ("rail_id","block_number","log_index");
 CREATE INDEX IF NOT EXISTS "rail_settlements_rail_id_block_number_log_index_index" ON "rail_settlements" USING btree ("rail_id","block_number","log_index");

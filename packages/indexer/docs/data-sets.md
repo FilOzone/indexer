@@ -98,7 +98,7 @@ The block of the latest event that changed the row.
 
 ## `pieces`
 
-Keyed by `(data_set_id, piece_id)`, with an index on `cid`.
+Keyed by `(data_set_id, piece_id)`, with indexes on `cid` and `ipfs_root_cid`.
 
 ### `cid` and `raw_size`
 
@@ -115,6 +115,32 @@ only shrinks the list while cleaning up a deleted data set.
 
 The piece's metadata from `PieceAdded`, or null without any. FWSS deletes a piece's metadata when the piece is removed.
 The indexer keeps it.
+
+### `ipfs_root_cid`
+
+The piece's `ipfsRootCID` metadata, normalized to a CIDv1 base32 string, with an index. It's the root CID of the IPFS
+content (a UNIXFS DAG packed as a CAR) that the piece holds. Apps such as synapse-core set the key, and the storage
+provider uses it to serve the content over IPFS when the data set has `withIPFSIndexing`. FWSS doesn't read it.
+
+Normalizing means one exact match finds a root however the app spelled it:
+
+- A CIDv0 (`Qm…`) becomes its dag-pb CIDv1 (`bafy…`).
+- A CIDv1 in base58btc (`z…`) or base36 (`k…`) is rewritten in base32.
+- A value that isn't a CID leaves the column null. The original value is still in `metadata`.
+
+To look up a root, normalize it the same way (`CID.parse(cid).toV1().toString()` with `multiformats`) and match
+`ipfs_root_cid`. The column is set whether or not the data set has `with_ipfs_indexing`, so add that filter when you
+need a provider that serves the content over IPFS:
+
+```sql
+select p.data_set_id, p.piece_id, d.provider_id
+from pieces p
+join data_sets d on d.data_set_id = p.data_set_id
+where p.ipfs_root_cid = $1 and not p.removed and d.with_ipfs_indexing
+```
+
+The helper is
+[`apps/ponder/src/utils/ipfs-root-cid.ts`](https://github.com/FilOzone/indexer/blob/main/apps/ponder/src/utils/ipfs-root-cid.ts).
 
 ### `removed` and `removed_at_block`
 

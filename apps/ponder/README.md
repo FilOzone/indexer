@@ -21,7 +21,8 @@ lives in the package, makes release-please release `@filoz/indexer` for the chan
   checks; `CDNServiceTerminated` clears `with_cdn` and removes the key. `pdp_end_epoch IS NOT NULL` means PDP payment
   termination has started. `pdp_rail_id`, `cache_miss_rail_id` and `cdn_rail_id` link to `rails`; the CDN ones are null without CDN.
 - `pieces`: current piece inventory keyed by `(data_set_id, piece_id)`, with a secondary CID index for finding alternate
-  providers. Deleting a data set marks its remaining pieces removed, because PDPVerifier cleans them up without
+  providers. `ipfs_root_cid` holds the `ipfsRootCID` metadata normalized to CIDv1 base32, indexed for IPFS retrieval
+  lookups. Deleting a data set marks its remaining pieces removed, because PDPVerifier cleans them up without
   `PiecesRemoved`.
 - `rails`: current FilecoinPay rail state for every operator, folded from rail events: the latest rate and lockup,
   termination and finalization, and running settlement and one-time payment totals. Indexed by payer, payee and
