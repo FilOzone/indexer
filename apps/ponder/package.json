@@ -2,7 +2,7 @@
   "name": "@filoz/indexer-ponder",
   "version": "0.0.0",
   "private": true,
-  "description": "Ponder indexer for FOC inventory",
+  "description": "Ponder indexer for Filecoin inventory",
   "type": "module",
   "scripts": {
     "start": "ponder start",
