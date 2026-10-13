@@ -1,0 +1,41 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "typecheck": {
+      "dependsOn": ["^build", "codegen:mainnet"]
+    },
+    "codegen:mainnet": {
+      "dependsOn": ["^build"],
+      "outputs": ["ponder-env.d.ts", "generated/**"]
+    },
+    "codegen:calibnet": {
+      "dependsOn": ["^build"],
+      "outputs": ["ponder-env.d.ts", "generated/**"]
+    },
+    "dev:mainnet": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true,
+      "passThroughEnv": ["DATABASE_URL", "RPC_URL", "PONDER_STRICT_ENV"]
+    },
+    "dev:calibnet": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true,
+      "passThroughEnv": ["DATABASE_URL", "RPC_URL", "PONDER_STRICT_ENV"]
+    },
+    "start:mainnet": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true,
+      "passThroughEnv": ["DATABASE_URL", "RPC_URL", "PONDER_STRICT_ENV"]
+    },
+    "start:calibnet": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true,
+      "passThroughEnv": ["DATABASE_URL", "RPC_URL", "PONDER_STRICT_ENV"]
+    }
+  }
+}
