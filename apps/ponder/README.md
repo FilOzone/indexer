@@ -20,8 +20,6 @@ Ponder owns the on-chain write schema in `apps/ponder/ponder.schema.ts`, with ta
 ## Commands
 
 ```sh
-pnpm turbo run codegen:mainnet --filter=@filoz/indexer-ponder
-pnpm turbo run codegen:calibnet --filter=@filoz/indexer-ponder
 pnpm turbo run typecheck --filter=@filoz/indexer-ponder
 pnpm run dev:mainnet
 pnpm run dev:calibnet

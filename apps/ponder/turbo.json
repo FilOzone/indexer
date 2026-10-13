@@ -2,17 +2,6 @@
   "$schema": "https://turborepo.com/schema.json",
   "extends": ["//"],
   "tasks": {
-    "typecheck": {
-      "dependsOn": ["^build", "codegen:mainnet"]
-    },
-    "codegen:mainnet": {
-      "dependsOn": ["^build"],
-      "outputs": ["ponder-env.d.ts", "generated/**"]
-    },
-    "codegen:calibnet": {
-      "dependsOn": ["^build"],
-      "outputs": ["ponder-env.d.ts", "generated/**"]
-    },
     "dev:mainnet": {
       "dependsOn": ["^build"],
       "cache": false,
