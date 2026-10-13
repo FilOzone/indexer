@@ -13,7 +13,7 @@
     "test": "node --test test/*.test.ts",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
-    "clean": "rm -rf dist generated .ponder .turbo"
+    "clean": "rm -rf dist .ponder .turbo"
   },
   "dependencies": {
     "@filoz/indexer": "workspace:*",

@@ -36,8 +36,7 @@
       "!apps/ponder/abis/*.ts",
       "!apps/ponder/ponder-env.d.ts",
       "!**/.turbo",
-      "!**/.ponder",
-      "!apps/ponder/generated"
+      "!**/.ponder"
     ]
   },
   "vcs": {

@@ -38,4 +38,3 @@ lerna-debug.log*
 .zed
 # Ponder
 .ponder/
-generated/
