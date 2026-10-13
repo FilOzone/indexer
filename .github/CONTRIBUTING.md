@@ -1,4 +1,4 @@
-# Contributing to FOC Indexer
+# Contributing to Filecoin Indexer
 
 Thank you for helping to improve the project! We are so happy that you are contributing! 💖
 

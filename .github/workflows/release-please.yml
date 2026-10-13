@@ -5,10 +5,11 @@ on:
     branches:
       - main
 
-permissions:
-  contents: write
-  issues: write
-  pull-requests: write
+permissions: {}
+
+concurrency:
+  group: release-please
+  cancel-in-progress: false
 
 jobs:
   release:
@@ -16,7 +17,7 @@ jobs:
     outputs:
       paths_released: ${{ steps.release.outputs.paths_released }}
     steps:
-      - uses: googleapis/release-please-action@v5
+      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
         id: release
         with:
           # PAT so release PRs trigger other workflows (auto-label, add-issues-and-prs-to-fs-project-board).
@@ -32,14 +33,15 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    env:
-      RELEASE_PATH: ${{ fromJson(needs.release.outputs.paths_released)[0] }}
+    strategy:
+      fail-fast: false
+      matrix:
+        path: ${{ fromJson(needs.release.outputs.paths_released) }}
     steps:
-      - uses: actions/checkout@v7
-      - uses: pnpm/setup@v3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/setup@a0881977cd8ea73b1ed212236c99ca10dcc80cf4 # v3.1.1
         with:
           require-lockfile: true
-      - run: pnpm run lint
-      - run: pnpm run build
-      - run: pnpm publish --access=public
-        working-directory: ${{ env.RELEASE_PATH }}
+      - run: pnpm run check
+      - run: pnpm publish --no-git-checks
+        working-directory: ${{ matrix.path }}
