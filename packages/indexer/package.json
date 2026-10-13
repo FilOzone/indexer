@@ -21,10 +21,13 @@
   },
   "files": [
     "dist/packages/indexer/src",
-    "dist/apps/ponder"
+    "dist/apps/ponder",
+    "schema.sql"
   ],
   "scripts": {
     "build": "tsc --build --pretty",
+    "test": "node --test test/*.test.ts",
+    "schema:sql": "node scripts/schema-sql.ts",
     "lint": "biome check .",
     "clean": "rm -rf dist *.tsbuildinfo .turbo"
   },

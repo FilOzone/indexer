@@ -6,6 +6,10 @@ Indexes FWSS inventory state for datasets, pieces, and storage providers.
 The schema is defined once, in `ponder.schema.ts`. `@filoz/indexer` compiles that file and re-exports its tables, so
 downstream consumers can query the same tables with Drizzle without running Ponder.
 
+After changing the schema, run `pnpm --filter @filoz/indexer schema:sql` and commit the updated
+`packages/indexer/schema.sql`. Its test fails until you do. The snapshot shows the SQL diff in review and, because it
+lives in the package, makes release-please release `@filoz/indexer` for the change.
+
 ## Tables
 
 - `providers`: current ServiceProviderRegistry state, including provider name from block-scoped `eth_call`s, the PDP
