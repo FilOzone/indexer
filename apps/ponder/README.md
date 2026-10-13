@@ -14,12 +14,15 @@ lives in the package, makes release-please release `@filoz/indexer` for the chan
 ## Tables
 
 - `providers`: current ServiceProviderRegistry state, including provider name from block-scoped `eth_call`s, the PDP
-  product `serviceURL`, FWSS approval status, and endorsement status from the canonical ProviderIdSet.
+  product `serviceURL`, FWSS approval status, and endorsement status from the canonical ProviderIdSet. `ProviderRemoved`
+  also clears `pdp_product_active`, because the registry deactivates the product without `ProductRemoved`.
 - `data_sets`: current FWSS dataset state, including the dataset payer and optional metadata `source`. `with_cdn` and
-  `with_ipfs_indexing` are extracted from dataset metadata. `pdp_end_epoch IS NOT NULL` means PDP payment termination has
-  started. `pdp_rail_id`, `cache_miss_rail_id` and `cdn_rail_id` link to `rails`; the CDN ones are null without CDN.
+  `with_ipfs_indexing` are true when the metadata has the `withCDN` or `withIPFSIndexing` key, whatever its value, as FWSS
+  checks; `CDNServiceTerminated` clears `with_cdn` and removes the key. `pdp_end_epoch IS NOT NULL` means PDP payment
+  termination has started. `pdp_rail_id`, `cache_miss_rail_id` and `cdn_rail_id` link to `rails`; the CDN ones are null without CDN.
 - `pieces`: current piece inventory keyed by `(data_set_id, piece_id)`, with a secondary CID index for finding alternate
-  providers.
+  providers. Deleting a data set marks its remaining pieces removed, because PDPVerifier cleans them up without
+  `PiecesRemoved`.
 - `rails`: current FilecoinPay rail state for every operator, folded from rail events: the latest rate and lockup,
   termination and finalization, and running settlement and one-time payment totals. Indexed by payer, payee and
   operator.
@@ -36,9 +39,10 @@ lives in the package, makes release-please release `@filoz/indexer` for the chan
   and folded from SessionKeyRegistry `AuthorizationsUpdated` events. A revoked permission has `expiry` 0.
 - `session_key_events`: every `AuthorizationsUpdated` event, keyed by `(block_number, log_index)`.
 
-[`packages/indexer/docs/rails.md`](../../packages/indexer/docs/rails.md) and
-[`packages/indexer/docs/session-keys.md`](../../packages/indexer/docs/session-keys.md) document the calculated rail and
-session key columns in detail, with the contract code each rule follows.
+[`packages/indexer/docs`](../../packages/indexer/docs) documents every calculated column in detail, with the contract code
+each rule follows: [data sets and pieces](../../packages/indexer/docs/data-sets.md),
+[providers](../../packages/indexer/docs/providers.md), [rails](../../packages/indexer/docs/rails.md) and
+[session keys](../../packages/indexer/docs/session-keys.md).
 
 ## Commands
 
