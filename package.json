@@ -2,7 +2,7 @@
   "name": "indexer",
   "version": "0.0.0",
   "private": true,
-  "description": "FOC indexer and shared database schema",
+  "description": "Filecoin indexer and shared database schema",
   "license": "Apache-2.0 OR MIT",
   "scripts": {
     "preinstall": "pnpx only-allow pnpm",
@@ -22,7 +22,7 @@
     "turbo": "catalog:",
     "typescript": "catalog:"
   },
-  "packageManager": "pnpm@11.7.0",
+  "packageManager": "pnpm@12.10.1",
   "devEngines": {
     "runtime": {
       "name": "node",
