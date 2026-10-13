@@ -1,6 +1,6 @@
-# ⨎ FOC Indexer
+# ⨎ Filecoin Indexer
 
-> Ponder indexer and shared database schema for Filecoin Onchain Cloud inventory
+> Ponder indexer and shared database schema for Filecoin inventory
 
 ## Packages
 
@@ -8,7 +8,7 @@
 
 ## Apps
 
-- [ponder](./apps/ponder) - FOC indexer
+- [ponder](./apps/ponder) - Filecoin indexer
 
 ## Development
 
