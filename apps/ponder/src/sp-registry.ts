@@ -1,10 +1,10 @@
 import type { Context, Event } from 'ponder:registry'
 import { ponder } from 'ponder:registry'
 import { providers } from 'ponder:schema'
-import { PDP_PRODUCT_TYPE } from '@filoz/indexer'
-import type { Address } from 'viem'
-import { ServiceProviderRegistryAbi } from './abis.ts'
-import { eventBlock } from './event-utils.ts'
+import { serviceProviderRegistry } from '@filoz/synapse-core/abis'
+import { PRODUCTS } from '@filoz/synapse-core/sp-registry'
+import { capabilitiesListToObject, decodePDPCapabilities } from '@filoz/synapse-core/utils'
+import type { Address, Hex } from 'viem'
 
 interface ProviderInfo {
   providerAddress: Address | null
@@ -15,33 +15,6 @@ interface ProviderInfo {
 type SpRegistryContext = Pick<Context<'SPRegistry:ProviderRegistered'>, 'client' | 'db'>
 type SpRegistryEvent = Pick<Event<'SPRegistry:ProviderRegistered'>, 'block' | 'log'>
 
-function decodeCapabilityValue(hex: `0x${string}`): string {
-  try {
-    const bytes = Buffer.from(hex.slice(2), 'hex')
-    const value = bytes.toString('utf-8')
-    if (value.includes('\ufffd')) return hex
-    return value.replace(/\0+$/u, '')
-  } catch {
-    return hex
-  }
-}
-
-function capabilitiesFromEntries(
-  keys: readonly string[],
-  values: readonly `0x${string}`[]
-): Record<string, string> | null {
-  if (keys.length === 0) return null
-
-  const capabilities: Record<string, string> = {}
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i]
-    const value = values[i]
-    if (key === undefined) continue
-    capabilities[key] = value ? decodeCapabilityValue(value) : ''
-  }
-  return capabilities
-}
-
 async function readProviderInfo(
   context: Pick<SpRegistryContext, 'client'>,
   registryAddress: Address,
@@ -49,7 +22,7 @@ async function readProviderInfo(
   blockNumber: bigint
 ): Promise<ProviderInfo> {
   const result = await context.client.readContract({
-    abi: ServiceProviderRegistryAbi,
+    abi: serviceProviderRegistry,
     address: registryAddress,
     functionName: 'providers',
     args: [providerId],
@@ -84,7 +57,6 @@ async function upsertProviderInfo({
     // The event payload is enough to keep address-level repair inventory usable.
   }
 
-  const block = eventBlock(event)
   await context.db
     .insert(providers)
     .values({
@@ -97,13 +69,56 @@ async function upsertProviderInfo({
       approved: false,
       endorsed: false,
       createdAtBlock: event.block.number,
-      ...block,
+      updatedAtBlock: event.block.number,
     })
     .onConflictDoUpdate({
       providerAddress: info.providerAddress,
       name: info.name,
       providerActive: info.providerActive,
-      ...block,
+      updatedAtBlock: event.block.number,
+    })
+}
+
+async function upsertPdpProduct({
+  context,
+  event,
+  providerId,
+  productType,
+  serviceProvider,
+  capabilityKeys,
+  capabilityValues,
+}: {
+  context: SpRegistryContext
+  event: SpRegistryEvent
+  providerId: bigint
+  productType: number
+  serviceProvider: Address
+  capabilityKeys: readonly string[]
+  capabilityValues: readonly Hex[]
+}) {
+  if (productType !== PRODUCTS.PDP) return
+
+  const { serviceURL: serviceUrl } = decodePDPCapabilities(capabilitiesListToObject(capabilityKeys, capabilityValues))
+
+  await context.db
+    .insert(providers)
+    .values({
+      providerId,
+      providerAddress: serviceProvider,
+      name: null,
+      serviceUrl,
+      providerActive: true,
+      pdpProductActive: true,
+      approved: false,
+      endorsed: false,
+      createdAtBlock: event.block.number,
+      updatedAtBlock: event.block.number,
+    })
+    .onConflictDoUpdate({
+      providerAddress: serviceProvider,
+      serviceUrl,
+      pdpProductActive: true,
+      updatedAtBlock: event.block.number,
     })
 }
 
@@ -119,73 +134,23 @@ ponder.on('SPRegistry:ProviderInfoUpdated', async ({ event, context }) => {
 })
 
 ponder.on('SPRegistry:ProductAdded', async ({ event, context }) => {
-  const { providerId, productType, serviceProvider, capabilityKeys, capabilityValues } = event.args
-  if (productType !== PDP_PRODUCT_TYPE) return
-
-  const capabilities = capabilitiesFromEntries(capabilityKeys, capabilityValues)
-  const block = eventBlock(event)
-
-  await context.db
-    .insert(providers)
-    .values({
-      providerId,
-      providerAddress: serviceProvider,
-      name: null,
-      serviceUrl: capabilities?.serviceURL ?? null,
-      providerActive: true,
-      pdpProductActive: true,
-      approved: false,
-      endorsed: false,
-      createdAtBlock: event.block.number,
-      ...block,
-    })
-    .onConflictDoUpdate({
-      providerAddress: serviceProvider,
-      serviceUrl: capabilities?.serviceURL ?? null,
-      pdpProductActive: true,
-      ...block,
-    })
+  await upsertPdpProduct({ context, event, ...event.args })
 })
 
 ponder.on('SPRegistry:ProductUpdated', async ({ event, context }) => {
-  const { providerId, productType, serviceProvider, capabilityKeys, capabilityValues } = event.args
-  if (productType !== PDP_PRODUCT_TYPE) return
-
-  const capabilities = capabilitiesFromEntries(capabilityKeys, capabilityValues)
-  const block = eventBlock(event)
-
-  await context.db
-    .insert(providers)
-    .values({
-      providerId,
-      providerAddress: serviceProvider,
-      name: null,
-      serviceUrl: capabilities?.serviceURL ?? null,
-      providerActive: true,
-      pdpProductActive: true,
-      approved: false,
-      endorsed: false,
-      createdAtBlock: event.block.number,
-      ...block,
-    })
-    .onConflictDoUpdate({
-      providerAddress: serviceProvider,
-      serviceUrl: capabilities?.serviceURL ?? null,
-      pdpProductActive: true,
-      ...block,
-    })
+  await upsertPdpProduct({ context, event, ...event.args })
 })
 
 ponder.on('SPRegistry:ProductRemoved', async ({ event, context }) => {
   const { providerId, productType } = event.args
-  if (productType !== PDP_PRODUCT_TYPE) return
+  if (productType !== PRODUCTS.PDP) return
 
   const existing = await context.db.find(providers, { providerId })
   if (!existing) return
 
   await context.db.update(providers, { providerId }).set({
     pdpProductActive: false,
-    ...eventBlock(event),
+    updatedAtBlock: event.block.number,
   })
 })
 
@@ -196,6 +161,6 @@ ponder.on('SPRegistry:ProviderRemoved', async ({ event, context }) => {
 
   await context.db.update(providers, { providerId }).set({
     providerActive: false,
-    ...eventBlock(event),
+    updatedAtBlock: event.block.number,
   })
 })

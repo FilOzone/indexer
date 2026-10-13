@@ -1,34 +1,17 @@
 import { createConfig } from 'ponder'
-import { FilecoinWarmStorageServiceAbi, PDPVerifierAbi, ServiceProviderRegistryAbi } from './src/abis.ts'
-import { NETWORKS, type NetworkName } from './src/networks.ts'
-import { rpcTransport } from './src/rpc.ts'
+import { NETWORKS } from './src/networks.ts'
+import { env } from './src/utils/env.ts'
+import { parseNetwork } from './src/utils/parse-network.ts'
+import { parseStrictEnv } from './src/utils/parse-strict-env.ts'
+import { rpcTransport } from './src/utils/rpc-transport.ts'
 
 const DEFAULT_DATABASE_URL = 'postgres://ponder:ponder@localhost:17825/ponder'
 const DEFAULT_RPC_URL = 'http://localhost:1234/rpc/v1'
 
-function parseNetwork(value: string | undefined, strict: boolean): NetworkName {
-  if (value === undefined || value === '') {
-    if (strict) throw new Error('PONDER_NETWORK is required when PONDER_STRICT_ENV=true')
-    return 'mainnet'
-  }
-  if (value === 'mainnet' || value === 'calibnet') return value
-  throw new Error(`Unsupported PONDER_NETWORK "${value}". Expected "mainnet" or "calibnet".`)
-}
-
-function parseStrictEnv(value: string | undefined): boolean {
-  return value === '1' || value === 'true'
-}
-
-function env(name: string, fallback: string, strict: boolean): string {
-  const value = process.env[name]
-  if (value !== undefined && value !== '') return value
-  if (strict) throw new Error(`${name} is required when PONDER_STRICT_ENV=true`)
-  return fallback
-}
-
 const strictEnv = parseStrictEnv(process.env.PONDER_STRICT_ENV)
 const networkName = parseNetwork(process.env.PONDER_NETWORK, strictEnv)
 const network = NETWORKS[networkName]
+const { contracts } = network.chain
 
 export default createConfig({
   database: {
@@ -37,35 +20,35 @@ export default createConfig({
   },
   chains: {
     [networkName]: {
-      id: network.CHAIN_ID,
+      id: network.chain.id,
       rpc: rpcTransport(env('RPC_URL', DEFAULT_RPC_URL, strictEnv)),
       pollingInterval: 30_000,
     },
   },
   contracts: {
     FWSS: {
-      abi: FilecoinWarmStorageServiceAbi,
+      abi: contracts.fwss.abi,
       chain: networkName,
-      address: network.FWSS,
-      startBlock: network.START_BLOCK,
+      address: contracts.fwss.address,
+      startBlock: network.startBlock,
     },
     PDPVerifier: {
-      abi: PDPVerifierAbi,
+      abi: contracts.pdp.abi,
       chain: networkName,
-      address: network.PDP_VERIFIER,
-      startBlock: network.START_BLOCK,
+      address: contracts.pdp.address,
+      startBlock: network.startBlock,
     },
     SPRegistry: {
-      abi: ServiceProviderRegistryAbi,
+      abi: contracts.serviceProviderRegistry.abi,
       chain: networkName,
-      address: network.SP_REGISTRY,
-      startBlock: network.START_BLOCK,
+      address: contracts.serviceProviderRegistry.address,
+      startBlock: network.startBlock,
     },
   },
   blocks: {
     ProviderStatusSync: {
       chain: networkName,
-      startBlock: network.ENDORSEMENT_SET_START_BLOCK,
+      startBlock: network.endorsementSetStartBlock,
       interval: 480,
     },
   },

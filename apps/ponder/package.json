@@ -20,7 +20,7 @@
   "dependencies": {
     "@filoz/indexer": "workspace:*",
     "hono": "^4.12.18",
-    "multiformats": "^13",
+    "@filoz/synapse-core": "catalog:",
     "ponder": "npm:@rvagg/ponder@^0.16.6",
     "viem": "catalog:"
   },

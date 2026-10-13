@@ -1,15 +1,14 @@
 import { ponder } from 'ponder:registry'
 import { dataSets, pieces, providers } from 'ponder:schema'
-import { decodePiece } from './cid-utils.ts'
-import { eventBlock, metadataFromEntries, metadataHasEmptyFlag } from './event-utils.ts'
+import { decodePiece } from './utils/decode-piece.ts'
+import { metadataFromEntries } from './utils/metadata-from-entries.ts'
 
 ponder.on('FWSS:DataSetCreated', async ({ event, context }) => {
   const { dataSetId, providerId, payer, metadataKeys, metadataValues } = event.args
   const metadata = metadataFromEntries(metadataKeys, metadataValues)
   const source = metadata?.source ?? null
-  const block = eventBlock(event)
-  const withCdn = metadataHasEmptyFlag(metadata, 'withCDN')
-  const withIpfsIndexing = metadataHasEmptyFlag(metadata, 'withIPFSIndexing')
+  const withCdn = metadata?.withCDN === ''
+  const withIpfsIndexing = metadata?.withIPFSIndexing === ''
 
   await context.db
     .insert(dataSets)
@@ -24,7 +23,7 @@ ponder.on('FWSS:DataSetCreated', async ({ event, context }) => {
       pdpEndEpoch: null,
       deleted: false,
       createdAtBlock: event.block.number,
-      ...block,
+      updatedAtBlock: event.block.number,
     })
     .onConflictDoUpdate({
       providerId,
@@ -34,7 +33,7 @@ ponder.on('FWSS:DataSetCreated', async ({ event, context }) => {
       withCdn,
       withIpfsIndexing,
       deleted: false,
-      ...block,
+      updatedAtBlock: event.block.number,
     })
 })
 
@@ -43,7 +42,6 @@ ponder.on('FWSS:PieceAdded', async ({ event, context }) => {
 
   const decoded = decodePiece(pieceCidRaw)
   const metadata = metadataFromEntries(keys, values)
-  const block = eventBlock(event)
 
   await context.db
     .insert(pieces)
@@ -56,7 +54,7 @@ ponder.on('FWSS:PieceAdded', async ({ event, context }) => {
       removed: false,
       addedAtBlock: event.block.number,
       removedAtBlock: null,
-      ...block,
+      updatedAtBlock: event.block.number,
     })
     .onConflictDoUpdate({
       cid: decoded.cid,
@@ -64,7 +62,7 @@ ponder.on('FWSS:PieceAdded', async ({ event, context }) => {
       metadata,
       removed: false,
       removedAtBlock: null,
-      ...block,
+      updatedAtBlock: event.block.number,
     })
 })
 
@@ -75,7 +73,7 @@ ponder.on('FWSS:PDPPaymentTerminated', async ({ event, context }) => {
 
   await context.db.update(dataSets, { dataSetId }).set({
     pdpEndEpoch: endEpoch,
-    ...eventBlock(event),
+    updatedAtBlock: event.block.number,
   })
 })
 
@@ -86,7 +84,7 @@ ponder.on('FWSS:ProviderApproved', async ({ event, context }) => {
 
   await context.db.update(providers, { providerId }).set({
     approved: true,
-    ...eventBlock(event),
+    updatedAtBlock: event.block.number,
   })
 })
 
@@ -97,6 +95,6 @@ ponder.on('FWSS:ProviderUnapproved', async ({ event, context }) => {
 
   await context.db.update(providers, { providerId }).set({
     approved: false,
-    ...eventBlock(event),
+    updatedAtBlock: event.block.number,
   })
 })
