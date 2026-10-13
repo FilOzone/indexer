@@ -1,4 +1,4 @@
-import { tableNames } from '@filoz/indexer'
+import { tableNames } from '@filoz/indexer/table-names'
 import { index, onchainTable, primaryKey } from 'ponder'
 
 export const providers = onchainTable(

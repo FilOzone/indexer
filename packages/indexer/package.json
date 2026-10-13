@@ -17,6 +17,10 @@
     ".": {
       "types": "./dist/src/index.d.ts",
       "default": "./dist/src/index.js"
+    },
+    "./table-names": {
+      "types": "./dist/src/table-names.d.ts",
+      "default": "./dist/src/table-names.js"
     }
   },
   "files": [
@@ -30,11 +34,12 @@
     "lint": "biome check .",
     "clean": "rm -rf dist *.tsbuildinfo .turbo"
   },
-  "dependencies": {
-    "drizzle-orm": "catalog:"
+  "peerDependencies": {
+    "drizzle-orm": ">=0.41.0 <1"
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",
+    "drizzle-orm": "catalog:",
     "typescript": "catalog:"
   },
   "publishConfig": {

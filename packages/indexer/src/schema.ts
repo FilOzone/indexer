@@ -1,10 +1,10 @@
-import { getTableName } from 'drizzle-orm'
 import { bigint, boolean, index, jsonb, pgTable, primaryKey, text } from 'drizzle-orm/pg-core'
+import { tableNames } from './table-names.ts'
 
 export type JsonRecord = Record<string, string>
 
 export const providers = pgTable(
-  'providers',
+  tableNames.providers,
   {
     providerId: bigint('provider_id', { mode: 'bigint' }).primaryKey(),
     providerAddress: text('provider_address'),
@@ -21,7 +21,7 @@ export const providers = pgTable(
 )
 
 export const dataSets = pgTable(
-  'data_sets',
+  tableNames.dataSets,
   {
     dataSetId: bigint('data_set_id', { mode: 'bigint' }).primaryKey(),
     providerId: bigint('provider_id', { mode: 'bigint' }).notNull(),
@@ -39,7 +39,7 @@ export const dataSets = pgTable(
 )
 
 export const pieces = pgTable(
-  'pieces',
+  tableNames.pieces,
   {
     dataSetId: bigint('data_set_id', { mode: 'bigint' }).notNull(),
     pieceId: bigint('piece_id', { mode: 'bigint' }).notNull(),
@@ -58,10 +58,4 @@ export const tables = {
   providers,
   dataSets,
   pieces,
-} as const
-
-export const tableNames = {
-  providers: getTableName(providers),
-  dataSets: getTableName(dataSets),
-  pieces: getTableName(pieces),
 } as const

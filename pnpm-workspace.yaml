@@ -11,7 +11,7 @@ catalog:
   '@filoz/synapse-core': ^0.10.1
   '@biomejs/biome': 2.4.16
   '@types/node': ^25.9.2
-  drizzle-orm: ^0.45.2
+  drizzle-orm: 0.41.0
   turbo: ^2.11.7
   typescript: 6.0.3
   viem: ^2.50.4
