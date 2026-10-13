@@ -7,6 +7,8 @@ export interface Network {
   /** 10 blocks before FWSS proxy creation. */
   startBlock: number
   endorsementSetStartBlock: number
+  /** SessionKeyRegistry deployment block. */
+  sessionKeyRegistryStartBlock: number
 }
 
 export const NETWORKS = {
@@ -14,10 +16,12 @@ export const NETWORKS = {
     chain: mainnet,
     startBlock: 5_459_607,
     endorsementSetStartBlock: 5_664_991,
+    sessionKeyRegistryStartBlock: 5_459_604,
   },
   calibnet: {
     chain: calibration,
     startBlock: 3_141_266,
     endorsementSetStartBlock: 3_364_286,
+    sessionKeyRegistryStartBlock: 3_185_523,
   },
 } as const satisfies Record<NetworkName, Network>

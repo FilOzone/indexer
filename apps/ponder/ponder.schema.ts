@@ -61,3 +61,40 @@ export const pieces = onchainTable(
     cidIdx: index().on(table.cid),
   })
 )
+
+export const sessionKeyPermissions = onchainTable(
+  'session_key_permissions',
+  (t) => ({
+    identity: t.text().notNull(),
+    signer: t.text().notNull(),
+    permission: t.hex().notNull(),
+    expiry: t.bigint().notNull(),
+    origin: t.text().notNull(),
+    updatedAtBlock: t.int8({ mode: 'bigint' }).notNull(),
+    txHash: t.hex().notNull(),
+  }),
+  (table) => ({
+    pk: primaryKey({ columns: [table.identity, table.signer, table.permission] }),
+    signerIdx: index().on(table.signer),
+  })
+)
+
+export const sessionKeyEvents = onchainTable(
+  'session_key_events',
+  (t) => ({
+    blockNumber: t.int8({ mode: 'bigint' }).notNull(),
+    logIndex: t.integer().notNull(),
+    identity: t.text().notNull(),
+    signer: t.text().notNull(),
+    expiry: t.bigint().notNull(),
+    permissions: t.hex().array().notNull(),
+    origin: t.text().notNull(),
+    timestamp: t.int8({ mode: 'bigint' }).notNull(),
+    txHash: t.hex().notNull(),
+  }),
+  (table) => ({
+    pk: primaryKey({ columns: [table.blockNumber, table.logIndex] }),
+    identityIdx: index().on(table.identity),
+    signerIdx: index().on(table.signer),
+  })
+)

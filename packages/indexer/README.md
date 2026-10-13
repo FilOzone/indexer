@@ -72,6 +72,8 @@ The views are read-only from a consumer's point of view. Only Ponder writes to t
 | `providers` | `providers` | `Provider` |
 | `dataSets` | `data_sets` | `DataSet` |
 | `pieces` | `pieces` | `Piece` |
+| `sessionKeyPermissions` | `session_key_permissions` | `SessionKeyPermission` |
+| `sessionKeyEvents` | `session_key_events` | `SessionKeyEvent` |
 
 [`schema.sql`](./schema.sql) lists the columns and indexes as Ponder creates them. It is generated from
 `apps/ponder/ponder.schema.ts` and ships with the package.
