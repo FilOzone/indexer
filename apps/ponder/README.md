@@ -3,9 +3,8 @@
 
 Indexes FWSS inventory state for datasets, pieces, and storage providers.
 
-The shared Drizzle schema used by downstream consumers lives in `packages/indexer`.
-Ponder owns the on-chain write schema in `apps/ponder/ponder.schema.ts`, with table names imported from
-`@filoz/indexer`.
+The schema is defined once, in `ponder.schema.ts`. `@filoz/indexer` compiles that file and re-exports its tables, so
+downstream consumers can query the same tables with Drizzle without running Ponder.
 
 ## Tables
 
@@ -25,8 +24,7 @@ pnpm run dev:mainnet
 pnpm run dev:calibnet
 ```
 
-Turborepo builds `@filoz/indexer` before running any of these. Set `DATABASE_URL` and `RPC_URL` to override the local
-defaults.
+Set `DATABASE_URL` and `RPC_URL` to override the local defaults.
 
 Environment variables:
 

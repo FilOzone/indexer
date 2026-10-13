@@ -4,7 +4,7 @@
 
 ## Packages
 
-- [@filoz/indexer](./packages/indexer) - Shared Drizzle schema for the indexer database
+- [@filoz/indexer](./packages/indexer) - Indexer database schema, shared by Ponder and Drizzle consumers
 
 ## Apps
 
