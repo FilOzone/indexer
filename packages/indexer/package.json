@@ -1,7 +1,7 @@
 {
   "name": "@filoz/indexer",
   "version": "0.0.0",
-  "description": "Shared database schema for the FOC indexer",
+  "description": "Shared database schema for the Filecoin indexer",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/FilOzone/indexer.git",
