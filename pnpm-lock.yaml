@@ -176,6 +176,9 @@ catalogs:
     drizzle-orm:
       specifier: 0.41.0
       version: 0.41.0
+    ponder:
+      specifier: npm:@rvagg/ponder@0.17.4-filecoin.3
+      version: 0.17.4-filecoin.3
     turbo:
       specifier: ^2.11.7
       version: 2.11.7
@@ -205,9 +208,6 @@ importers:
 
   apps/ponder:
     dependencies:
-      '@filoz/indexer':
-        specifier: workspace:*
-        version: link:../../packages/indexer
       '@filoz/synapse-core':
         specifier: 'catalog:'
         version: 0.10.1(typescript@6.0.3)(viem@2.51.3(typescript@6.0.3)(zod@4.4.3))
@@ -215,7 +215,7 @@ importers:
         specifier: ^4.12.18
         version: 4.12.23
       ponder:
-        specifier: npm:@rvagg/ponder@0.17.4-filecoin.3
+        specifier: 'catalog:'
         version: '@rvagg/ponder@0.17.4-filecoin.3(@libsql/client@0.17.3)(@opentelemetry/api@1.9.1)(@types/node@25.9.2)(@types/pg@8.20.0)(hono@4.12.23)(typescript@6.0.3)(viem@2.51.3(typescript@6.0.3)(zod@4.4.3))(zod@4.4.3)'
       viem:
         specifier: 'catalog:'
@@ -227,21 +227,22 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 25.9.2
-      drizzle-orm:
-        specifier: 'catalog:'
-        version: 0.41.0(@electric-sql/pglite@0.2.13)(@libsql/client@0.17.3)(@opentelemetry/api@1.9.1)(@types/pg@8.20.0)(kysely@0.26.3)(pg@8.21.0)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
 
   packages/indexer:
+    dependencies:
+      ponder:
+        specifier: 'catalog:'
+        version: '@rvagg/ponder@0.17.4-filecoin.3(@libsql/client@0.17.3)(@opentelemetry/api@1.9.1)(@types/node@25.9.2)(@types/pg@8.20.0)(hono@4.12.23)(typescript@6.0.3)(viem@2.51.3(typescript@6.0.3)(zod@4.4.3))(zod@4.4.3)'
     devDependencies:
       '@biomejs/biome':
         specifier: 'catalog:'
         version: 2.4.16
       drizzle-orm:
         specifier: 'catalog:'
-        version: 0.41.0(@electric-sql/pglite@0.2.13)(@libsql/client@0.17.3)(@opentelemetry/api@1.9.1)(@types/pg@8.20.0)(kysely@0.29.2)(pg@8.21.0)
+        version: 0.41.0(@electric-sql/pglite@0.2.13)(@libsql/client@0.17.3)(@opentelemetry/api@1.9.1)(@types/pg@8.20.0)(kysely@0.26.3)(pg@8.21.0)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -2663,15 +2664,6 @@ snapshots:
       '@opentelemetry/api': 1.9.1
       '@types/pg': 8.20.0
       kysely: 0.26.3
-      pg: 8.21.0
-
-  drizzle-orm@0.41.0(@electric-sql/pglite@0.2.13)(@libsql/client@0.17.3)(@opentelemetry/api@1.9.1)(@types/pg@8.20.0)(kysely@0.29.2)(pg@8.21.0):
-    optionalDependencies:
-      '@electric-sql/pglite': 0.2.13
-      '@libsql/client': 0.17.3
-      '@opentelemetry/api': 1.9.1
-      '@types/pg': 8.20.0
-      kysely: 0.29.2
       pg: 8.21.0
 
   eastasianwidth@0.2.0: {}

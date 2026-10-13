@@ -1,8 +1,10 @@
-import { tableNames } from '@filoz/indexer/table-names'
+// The single schema definition. `@filoz/indexer` compiles and re-exports these tables for Drizzle consumers.
 import { index, onchainTable, primaryKey } from 'ponder'
 
+export type JsonRecord = Record<string, string>
+
 export const providers = onchainTable(
-  tableNames.providers,
+  'providers',
   (t) => ({
     providerId: t.int8({ mode: 'bigint' }).primaryKey(),
     providerAddress: t.text(),
@@ -21,13 +23,13 @@ export const providers = onchainTable(
 )
 
 export const dataSets = onchainTable(
-  tableNames.dataSets,
+  'data_sets',
   (t) => ({
     dataSetId: t.int8({ mode: 'bigint' }).primaryKey(),
     providerId: t.int8({ mode: 'bigint' }).notNull(),
     payer: t.text().notNull(),
     source: t.text(),
-    metadata: t.jsonb(),
+    metadata: t.jsonb().$type<JsonRecord | null>(),
     withCdn: t.boolean().notNull(),
     withIpfsIndexing: t.boolean().notNull(),
     pdpEndEpoch: t.int8({ mode: 'bigint' }),
@@ -41,13 +43,13 @@ export const dataSets = onchainTable(
 )
 
 export const pieces = onchainTable(
-  tableNames.pieces,
+  'pieces',
   (t) => ({
     dataSetId: t.int8({ mode: 'bigint' }).notNull(),
     pieceId: t.int8({ mode: 'bigint' }).notNull(),
     cid: t.text().notNull(),
     rawSize: t.int8({ mode: 'bigint' }).notNull(),
-    metadata: t.jsonb(),
+    metadata: t.jsonb().$type<JsonRecord | null>(),
     removed: t.boolean().notNull(),
     addedAtBlock: t.int8({ mode: 'bigint' }).notNull(),
     removedAtBlock: t.int8({ mode: 'bigint' }),

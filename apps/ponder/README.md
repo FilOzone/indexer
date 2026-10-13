@@ -3,9 +3,12 @@
 
 Indexes FWSS inventory state for datasets, pieces, and storage providers.
 
-The shared Drizzle schema used by downstream consumers lives in `packages/indexer`.
-Ponder owns the on-chain write schema in `apps/ponder/ponder.schema.ts`, with table names imported from
-`@filoz/indexer`.
+The schema is defined once, in `ponder.schema.ts`. `@filoz/indexer` compiles that file and re-exports its tables, so
+downstream consumers can query the same tables with Drizzle without running Ponder.
+
+After changing the schema, run `pnpm --filter @filoz/indexer schema:sql` and commit the updated
+`packages/indexer/schema.sql`. Its test fails until you do. The snapshot shows the SQL diff in review and, because it
+lives in the package, makes release-please release `@filoz/indexer` for the change.
 
 ## Tables
 
@@ -25,8 +28,7 @@ pnpm run dev:mainnet
 pnpm run dev:calibnet
 ```
 
-Turborepo builds `@filoz/indexer` before running any of these. Set `DATABASE_URL` and `RPC_URL` to override the local
-defaults.
+Set `DATABASE_URL` and `RPC_URL` to override the local defaults.
 
 Environment variables:
 
@@ -39,6 +41,10 @@ Environment variables:
 
 Set `PONDER_STRICT_ENV=true` to require `PONDER_NETWORK`, `DATABASE_URL`, and `RPC_URL`, which is recommended for
 deployments.
+
+Production deployments write to their own `DATABASE_SCHEMA` and run with `--views-schema early-repair` (or
+`DATABASE_VIEWS_SCHEMA=early-repair`). Once a deployment finishes its backfill, Ponder points the views in
+`early-repair` at its tables. `@filoz/indexer` consumers query those views, so keep that name stable.
 
 ## Networks
 

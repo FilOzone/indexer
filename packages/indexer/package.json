@@ -9,33 +9,33 @@
   },
   "license": "Apache-2.0 OR MIT",
   "type": "module",
-  "main": "dist/src/index.js",
-  "module": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
+  "main": "dist/packages/indexer/src/index.js",
+  "module": "dist/packages/indexer/src/index.js",
+  "types": "dist/packages/indexer/src/index.d.ts",
   "sideEffects": false,
   "exports": {
     ".": {
-      "types": "./dist/src/index.d.ts",
-      "default": "./dist/src/index.js"
-    },
-    "./table-names": {
-      "types": "./dist/src/table-names.d.ts",
-      "default": "./dist/src/table-names.js"
+      "types": "./dist/packages/indexer/src/index.d.ts",
+      "default": "./dist/packages/indexer/src/index.js"
     }
   },
   "files": [
-    "src",
-    "dist/src",
-    "dist/src/**/*.d.ts",
-    "dist/src/**/*.d.ts.map"
+    "dist/packages/indexer/src",
+    "dist/apps/ponder",
+    "schema.sql"
   ],
   "scripts": {
     "build": "tsc --build --pretty",
+    "test": "node --test test/*.test.ts",
+    "schema:sql": "node scripts/schema-sql.ts",
     "lint": "biome check .",
     "clean": "rm -rf dist *.tsbuildinfo .turbo"
   },
+  "dependencies": {
+    "ponder": "catalog:"
+  },
   "peerDependencies": {
-    "drizzle-orm": ">=0.41.0 <1"
+    "drizzle-orm": "0.41.0"
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",
