@@ -1,0 +1,33 @@
+{
+  "name": "indexer",
+  "version": "0.0.0",
+  "private": true,
+  "description": "FOC indexer and shared database schema",
+  "license": "Apache-2.0 OR MIT",
+  "scripts": {
+    "preinstall": "pnpx only-allow pnpm",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "lint:fix": "biome check --fix .",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "check": "turbo run build lint test typecheck",
+    "dev:calibnet": "turbo run dev:calibnet --filter=@filoz/indexer-ponder",
+    "dev:mainnet": "turbo run dev:mainnet --filter=@filoz/indexer-ponder",
+    "check:repo": "pnpx sherif@latest -r root-package-manager-field",
+    "clean": "turbo run clean && rm -rf node_modules .turbo packages/*/node_modules apps/*/node_modules"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "catalog:",
+    "turbo": "catalog:",
+    "typescript": "catalog:"
+  },
+  "packageManager": "pnpm@11.7.0",
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "^24.14.0",
+      "onFail": "download"
+    }
+  }
+}

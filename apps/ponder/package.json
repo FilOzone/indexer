@@ -1,0 +1,33 @@
+{
+  "name": "@filoz/indexer-ponder",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Ponder indexer for FOC inventory",
+  "type": "module",
+  "scripts": {
+    "start": "ponder start",
+    "dev:calibnet": "PONDER_NETWORK=calibnet ponder dev",
+    "dev:mainnet": "PONDER_NETWORK=mainnet ponder dev",
+    "start:calibnet": "PONDER_NETWORK=calibnet ponder start",
+    "start:mainnet": "PONDER_NETWORK=mainnet ponder start",
+    "codegen:calibnet": "PONDER_NETWORK=calibnet RPC_URL=http://localhost:1235/rpc/v1 DATABASE_URL=postgres://noop:noop@localhost:5432/noop ponder codegen",
+    "codegen:mainnet": "PONDER_NETWORK=mainnet RPC_URL=http://localhost:1234/rpc/v1 DATABASE_URL=postgres://noop:noop@localhost:5432/noop ponder codegen",
+    "test": "node --test test/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "clean": "rm -rf dist generated .ponder .turbo"
+  },
+  "dependencies": {
+    "@filoz/indexer": "workspace:*",
+    "hono": "^4.12.18",
+    "multiformats": "^13",
+    "ponder": "npm:@rvagg/ponder@^0.16.6",
+    "viem": "catalog:"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "catalog:",
+    "@types/node": "catalog:",
+    "drizzle-orm": "catalog:",
+    "typescript": "catalog:"
+  }
+}
