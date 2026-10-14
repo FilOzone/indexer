@@ -52,9 +52,8 @@ CREATE TABLE "rail_one_time_payments" (
 	"net_payee_amount" numeric(78) NOT NULL,
 	"operator_commission" numeric(78) NOT NULL,
 	"network_fee" numeric(78) NOT NULL,
-	"timestamp" bigint NOT NULL,
 	"tx_hash" text NOT NULL,
-	CONSTRAINT "rail_one_time_payments_block_number_log_index_pk" PRIMARY KEY("block_number","log_index")
+	CONSTRAINT "rail_one_time_payments_rail_id_block_number_log_index_pk" PRIMARY KEY("rail_id","block_number","log_index")
 );
 
 CREATE TABLE "rail_settlements" (
@@ -66,9 +65,8 @@ CREATE TABLE "rail_settlements" (
 	"operator_commission" numeric(78) NOT NULL,
 	"network_fee" numeric(78) NOT NULL,
 	"settled_up_to" bigint NOT NULL,
-	"timestamp" bigint NOT NULL,
 	"tx_hash" text NOT NULL,
-	CONSTRAINT "rail_settlements_block_number_log_index_pk" PRIMARY KEY("block_number","log_index")
+	CONSTRAINT "rail_settlements_rail_id_block_number_log_index_pk" PRIMARY KEY("rail_id","block_number","log_index")
 );
 
 CREATE TABLE "rails" (
@@ -95,8 +93,6 @@ CREATE TABLE "rails" (
 	"total_one_time_amount" numeric(78) DEFAULT 0 NOT NULL,
 	"total_one_time_net_payee_amount" numeric(78) DEFAULT 0 NOT NULL,
 	"created_at_block" bigint NOT NULL,
-	"created_at" bigint NOT NULL,
-	"tx_hash" text NOT NULL,
 	"updated_at_block" bigint NOT NULL
 );
 
@@ -108,7 +104,6 @@ CREATE TABLE "session_key_events" (
 	"expiry" numeric(78) NOT NULL,
 	"permissions" text[] NOT NULL,
 	"origin" text NOT NULL,
-	"timestamp" bigint NOT NULL,
 	"tx_hash" text NOT NULL,
 	CONSTRAINT "session_key_events_block_number_log_index_pk" PRIMARY KEY("block_number","log_index")
 );
@@ -120,7 +115,6 @@ CREATE TABLE "session_key_permissions" (
 	"expiry" numeric(78) NOT NULL,
 	"origin" text NOT NULL,
 	"updated_at_block" bigint NOT NULL,
-	"tx_hash" text NOT NULL,
 	CONSTRAINT "session_key_permissions_identity_signer_permission_pk" PRIMARY KEY("identity","signer","permission")
 );
 
@@ -132,8 +126,6 @@ CREATE INDEX IF NOT EXISTS "data_sets_cdn_rail_id_index" ON "data_sets" USING bt
 CREATE INDEX IF NOT EXISTS "pieces_cid_index" ON "pieces" USING btree ("cid");
 CREATE INDEX IF NOT EXISTS "pieces_ipfs_root_cid_index" ON "pieces" USING btree ("ipfs_root_cid");
 CREATE INDEX IF NOT EXISTS "providers_provider_address_index" ON "providers" USING btree ("provider_address");
-CREATE INDEX IF NOT EXISTS "rail_one_time_payments_rail_id_block_number_log_index_index" ON "rail_one_time_payments" USING btree ("rail_id","block_number","log_index");
-CREATE INDEX IF NOT EXISTS "rail_settlements_rail_id_block_number_log_index_index" ON "rail_settlements" USING btree ("rail_id","block_number","log_index");
 CREATE INDEX IF NOT EXISTS "rails_payer_rail_id_index" ON "rails" USING btree ("payer","rail_id");
 CREATE INDEX IF NOT EXISTS "rails_payee_rail_id_index" ON "rails" USING btree ("payee","rail_id");
 CREATE INDEX IF NOT EXISTS "rails_operator_rail_id_index" ON "rails" USING btree ("operator","rail_id");

@@ -12,7 +12,6 @@ ponder.on('SessionKeyRegistry:AuthorizationsUpdated', async ({ event, context })
     expiry,
     permissions: [...permissions],
     origin,
-    timestamp: event.block.timestamp,
     txHash: event.transaction.hash,
   })
 
@@ -27,13 +26,11 @@ ponder.on('SessionKeyRegistry:AuthorizationsUpdated', async ({ event, context })
         expiry,
         origin,
         updatedAtBlock: event.block.number,
-        txHash: event.transaction.hash,
       })
       .onConflictDoUpdate({
         expiry,
         origin,
         updatedAtBlock: event.block.number,
-        txHash: event.transaction.hash,
       })
   }
 })

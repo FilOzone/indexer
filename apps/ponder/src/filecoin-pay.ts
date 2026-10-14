@@ -16,8 +16,6 @@ ponder.on('FilecoinPay:RailCreated', async ({ event, context }) => {
     commissionRateBps,
     settledUpTo: event.block.number,
     createdAtBlock: event.block.number,
-    createdAt: event.block.timestamp,
-    txHash: event.transaction.hash,
     updatedAtBlock: event.block.number,
   })
 })
@@ -82,7 +80,6 @@ ponder.on('FilecoinPay:RailSettled', async ({ event, context }) => {
     operatorCommission,
     networkFee,
     settledUpTo,
-    timestamp: event.block.timestamp,
     txHash: event.transaction.hash,
   })
 
@@ -112,7 +109,6 @@ ponder.on('FilecoinPay:RailOneTimePaymentProcessed', async ({ event, context }) 
     netPayeeAmount,
     operatorCommission,
     networkFee,
-    timestamp: event.block.timestamp,
     txHash: event.transaction.hash,
   })
 

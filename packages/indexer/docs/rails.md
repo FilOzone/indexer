@@ -37,7 +37,8 @@ Amounts, rates and lockups are `uint256` on chain and `numeric(78)` in Postgres.
 
 `rail_id`, `payer`, `payee`, `token`, `operator`, `validator`, `service_fee_recipient` and `commission_rate_bps` never
 change after creation, so they're copied from `RailCreated`. FilecoinPay calls the payer `from` and the payee `to`.
-`created_at_block`, `created_at` (the block timestamp, in seconds) and `tx_hash` describe the creation transaction.
+`created_at_block` is the creation block. The table has no timestamp or transaction hash columns; derive the time
+from the block number (see [Block times](../README.md#block-times)).
 
 ### `payment_rate`
 
@@ -160,9 +161,9 @@ The block of the latest event that changed the row.
 
 ## `rail_settlements`
 
-One row per `RailSettled` event, keyed by `(block_number, log_index)` and indexed by
-`(rail_id, block_number, log_index)`. The amounts and `settled_up_to` are copied from the event; `timestamp` is the block
-timestamp, in seconds.
+One row per `RailSettled` event, keyed by `(rail_id, block_number, log_index)`. The table is always read one rail at a
+time, newest first, which that key covers without a second index. The amounts and `settled_up_to` are copied from the
+event, and `tx_hash` is the transaction that emitted it.
 
 FilecoinPay emits `RailSettled` for every settlement that gets past its early checks, including settlements of 0 and
 `settleTerminatedRailWithoutValidation`. It doesn't emit one when the rail is already settled. When a settlement call

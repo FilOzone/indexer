@@ -80,7 +80,6 @@ export const sessionKeyPermissions = onchainTable(
     expiry: t.bigint().notNull(),
     origin: t.text().notNull(),
     updatedAtBlock: t.int8({ mode: 'bigint' }).notNull(),
-    txHash: t.hex().notNull(),
   }),
   (table) => ({
     pk: primaryKey({ columns: [table.identity, table.signer, table.permission] }),
@@ -98,7 +97,6 @@ export const sessionKeyEvents = onchainTable(
     expiry: t.bigint().notNull(),
     permissions: t.hex().array().notNull(),
     origin: t.text().notNull(),
-    timestamp: t.int8({ mode: 'bigint' }).notNull(),
     txHash: t.hex().notNull(),
   }),
   (table) => ({
@@ -135,8 +133,6 @@ export const rails = onchainTable(
     totalOneTimeAmount: t.bigint().notNull().default(0n),
     totalOneTimeNetPayeeAmount: t.bigint().notNull().default(0n),
     createdAtBlock: t.int8({ mode: 'bigint' }).notNull(),
-    createdAt: t.int8({ mode: 'bigint' }).notNull(),
-    txHash: t.hex().notNull(),
     updatedAtBlock: t.int8({ mode: 'bigint' }).notNull(),
   }),
   (table) => ({
@@ -157,12 +153,11 @@ export const railSettlements = onchainTable(
     operatorCommission: t.bigint().notNull(),
     networkFee: t.bigint().notNull(),
     settledUpTo: t.int8({ mode: 'bigint' }).notNull(),
-    timestamp: t.int8({ mode: 'bigint' }).notNull(),
     txHash: t.hex().notNull(),
   }),
   (table) => ({
-    pk: primaryKey({ columns: [table.blockNumber, table.logIndex] }),
-    railIdIdx: index().on(table.railId, table.blockNumber, table.logIndex),
+    // Always read one rail at a time, newest first.
+    pk: primaryKey({ columns: [table.railId, table.blockNumber, table.logIndex] }),
   })
 )
 
@@ -176,11 +171,10 @@ export const railOneTimePayments = onchainTable(
     netPayeeAmount: t.bigint().notNull(),
     operatorCommission: t.bigint().notNull(),
     networkFee: t.bigint().notNull(),
-    timestamp: t.int8({ mode: 'bigint' }).notNull(),
     txHash: t.hex().notNull(),
   }),
   (table) => ({
-    pk: primaryKey({ columns: [table.blockNumber, table.logIndex] }),
-    railIdIdx: index().on(table.railId, table.blockNumber, table.logIndex),
+    // Always read one rail at a time, newest first.
+    pk: primaryKey({ columns: [table.railId, table.blockNumber, table.logIndex] }),
   })
 )

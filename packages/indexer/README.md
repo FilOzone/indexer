@@ -65,6 +65,21 @@ const copies = await db
 
 The views are read-only from a consumer's point of view. Only Ponder writes to the indexer database.
 
+## Block times
+
+The tables store block numbers, not timestamps. Filecoin epochs are exactly 30 seconds, so a block's timestamp is
+
+```
+timestamp = genesis + block_number * 30
+```
+
+| Network | Genesis timestamp (seconds) |
+| --- | --- |
+| Mainnet | `1598306400` |
+| Calibration | `1667326380` |
+
+The same values are in `@filoz/synapse-core/chains` as `genesisTimestamp`.
+
 ## Tables
 
 | Export | Table | Row type |

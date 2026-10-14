@@ -42,10 +42,10 @@ One row per `AuthorizationsUpdated` event, keyed by `(block_number, log_index)` 
 | `expiry` | Unix timestamp in seconds; 0 for a revoke. |
 | `permissions` | `text[]` of the permission typehashes (`bytes32`), lowercase `0x` hex. |
 | `origin` | The app that asked for the change, as the caller passed it. It can be an empty string. |
-| `timestamp` | Block timestamp, in seconds. |
-| `tx_hash` | |
+| `tx_hash` | The transaction that emitted the event. |
 
-Sort history newest first with `order by block_number desc, log_index desc`, which the primary key covers.
+Sort history newest first with `order by block_number desc, log_index desc`, which the primary key covers. There's no
+timestamp column; derive the time from `block_number` (see [Block times](../README.md#block-times)).
 
 ## `session_key_permissions`
 
@@ -57,7 +57,17 @@ The current expiry of each permission, keyed by `(identity, signer, permission)`
 | `expiry` | The event's `expiry`. |
 | `origin` | The event's `origin`. |
 | `updated_at_block` | The event's block. |
-| `tx_hash` | The event's transaction. |
+
+To find the transaction that last changed a permission, look up its event in `session_key_events`:
+
+```sql
+select tx_hash from session_key_events
+where identity = $1 and signer = $2 and block_number = $3 and $4 = any(permissions)
+order by log_index desc
+limit 1
+```
+
+with `$3` the row's `updated_at_block` and `$4` its `permission`.
 
 Ponder processes events in block and log order, so each row ends up with the latest event that named that permission.
 That's what `authorizationExpiry(identity, signer, permission)` returns on chain, because each call overwrites the
