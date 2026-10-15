@@ -3,8 +3,8 @@ import { ponder } from 'ponder:registry'
 import { providers } from 'ponder:schema'
 import { serviceProviderRegistry } from '@filoz/synapse-core/abis'
 import { PRODUCTS } from '@filoz/synapse-core/sp-registry'
-import { capabilitiesListToObject, decodePDPCapabilities } from '@filoz/synapse-core/utils'
 import type { Address, Hex } from 'viem'
+import { serviceUrlFromCapabilities } from './utils/service-url.ts'
 
 interface ProviderInfo {
   providerAddress: Address | null
@@ -45,16 +45,15 @@ async function upsertProviderInfo({
   providerId: bigint
   providerAddress?: Address
 }) {
-  let info: ProviderInfo = {
-    providerAddress: providerAddress ?? null,
-    name: null,
-    providerActive: true,
-  }
-
+  let info: ProviderInfo
   try {
     info = await readProviderInfo(context, event.log.address, providerId, event.block.number)
   } catch {
-    // The event payload is enough to keep address-level repair inventory usable.
+    // Keep what we already have rather than overwrite it with nulls. A new provider still gets a row from the event
+    // payload, which is enough for address-level repair inventory.
+    const existing = await context.db.find(providers, { providerId })
+    if (existing) return
+    info = { providerAddress: providerAddress ?? null, name: null, providerActive: true }
   }
 
   await context.db
@@ -98,7 +97,7 @@ async function upsertPdpProduct({
 }) {
   if (productType !== PRODUCTS.PDP) return
 
-  const { serviceURL: serviceUrl } = decodePDPCapabilities(capabilitiesListToObject(capabilityKeys, capabilityValues))
+  const serviceUrl = serviceUrlFromCapabilities(capabilityKeys, capabilityValues)
 
   await context.db
     .insert(providers)
@@ -154,6 +153,7 @@ ponder.on('SPRegistry:ProductRemoved', async ({ event, context }) => {
   })
 })
 
+// Removing a provider also deactivates its PDP product, without a `ProductRemoved` event.
 ponder.on('SPRegistry:ProviderRemoved', async ({ event, context }) => {
   const { providerId } = event.args
   const existing = await context.db.find(providers, { providerId })
@@ -161,6 +161,7 @@ ponder.on('SPRegistry:ProviderRemoved', async ({ event, context }) => {
 
   await context.db.update(providers, { providerId }).set({
     providerActive: false,
+    pdpProductActive: false,
     updatedAtBlock: event.block.number,
   })
 })

@@ -176,6 +176,9 @@ catalogs:
     drizzle-orm:
       specifier: 0.41.0
       version: 0.41.0
+    multiformats:
+      specifier: ^14.0.5
+      version: 14.0.5
     ponder:
       specifier: npm:@rvagg/ponder@0.17.4-filecoin.3
       version: 0.17.4-filecoin.3
@@ -214,6 +217,9 @@ importers:
       hono:
         specifier: ^4.12.18
         version: 4.12.23
+      multiformats:
+        specifier: 'catalog:'
+        version: 14.0.5
       ponder:
         specifier: 'catalog:'
         version: '@rvagg/ponder@0.17.4-filecoin.3(@libsql/client@0.17.3)(@opentelemetry/api@1.9.1)(@types/node@25.9.2)(@types/pg@8.20.0)(hono@4.12.23)(typescript@6.0.3)(viem@2.51.3(typescript@6.0.3)(zod@4.4.3))(zod@4.4.3)'

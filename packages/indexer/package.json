@@ -22,7 +22,8 @@
   "files": [
     "dist/packages/indexer/src",
     "dist/apps/ponder",
-    "schema.sql"
+    "schema.sql",
+    "docs"
   ],
   "scripts": {
     "build": "tsc --build --pretty",

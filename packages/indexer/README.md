@@ -65,6 +65,21 @@ const copies = await db
 
 The views are read-only from a consumer's point of view. Only Ponder writes to the indexer database.
 
+## Block times
+
+The tables store block numbers, not timestamps. Filecoin epochs are exactly 30 seconds, so a block's timestamp is
+
+```
+timestamp = genesis + block_number * 30
+```
+
+| Network | Genesis timestamp (seconds) |
+| --- | --- |
+| Mainnet | `1598306400` |
+| Calibration | `1667326380` |
+
+The same values are in `@filoz/synapse-core/chains` as `genesisTimestamp`.
+
 ## Tables
 
 | Export | Table | Row type |
@@ -72,6 +87,19 @@ The views are read-only from a consumer's point of view. Only Ponder writes to t
 | `providers` | `providers` | `Provider` |
 | `dataSets` | `data_sets` | `DataSet` |
 | `pieces` | `pieces` | `Piece` |
+| `rails` | `rails` | `Rail` |
+| `railSettlements` | `rail_settlements` | `RailSettlement` |
+| `railOneTimePayments` | `rail_one_time_payments` | `RailOneTimePayment` |
+| `sessionKeyPermissions` | `session_key_permissions` | `SessionKeyPermission` |
+| `sessionKeyEvents` | `session_key_events` | `SessionKeyEvent` |
+
+Many columns are calculated from several events, or follow contract behaviour that has no event, rather than copying one
+event field. These pages explain how each one is built and how to check it against the chain:
+
+- [`docs/data-sets.md`](./docs/data-sets.md): `data_sets` and `pieces`
+- [`docs/providers.md`](./docs/providers.md): `providers`
+- [`docs/rails.md`](./docs/rails.md): `rails`, `rail_settlements`, `rail_one_time_payments` and the data set rail ids
+- [`docs/session-keys.md`](./docs/session-keys.md): `session_key_permissions` and `session_key_events`
 
 [`schema.sql`](./schema.sql) lists the columns and indexes as Ponder creates them. It is generated from
 `apps/ponder/ponder.schema.ts` and ships with the package.

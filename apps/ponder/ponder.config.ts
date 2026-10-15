@@ -44,6 +44,18 @@ export default createConfig({
       address: contracts.serviceProviderRegistry.address,
       startBlock: network.startBlock,
     },
+    FilecoinPay: {
+      abi: contracts.filecoinPay.abi,
+      chain: networkName,
+      address: contracts.filecoinPay.address,
+      startBlock: network.filecoinPayStartBlock,
+    },
+    SessionKeyRegistry: {
+      abi: contracts.sessionKeyRegistry.abi,
+      chain: networkName,
+      address: contracts.sessionKeyRegistry.address,
+      startBlock: network.sessionKeyRegistryStartBlock,
+    },
   },
   blocks: {
     ProviderStatusSync: {
