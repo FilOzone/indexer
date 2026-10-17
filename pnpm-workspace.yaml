@@ -9,7 +9,7 @@ blockExoticSubdeps: true
 
 catalog:
   '@filoz/synapse-core': ^0.10.1
-  '@biomejs/biome': 2.4.16
+  '@biomejs/biome': 2.5.15
   '@types/node': ^26.6.4
   drizzle-orm: 0.41.0
   multiformats: ^14.0.5
