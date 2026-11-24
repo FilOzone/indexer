@@ -13,7 +13,10 @@ catalog:
   '@types/node': ^26.6.4
   drizzle-orm: 0.41.0
   multiformats: ^14.0.5
-  ponder: npm:@rvagg/ponder@0.17.4-filecoin.3
+  ponder: npm:@filoz/ponder@0.18.9-filecoin.1
   turbo: ^2.11.7
   typescript: 6.0.3
   viem: ^2.50.4
+
+minimumReleaseAgeExclude:
+  - '@filoz/ponder@0.18.9-filecoin.1'
