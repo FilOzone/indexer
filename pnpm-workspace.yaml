@@ -11,7 +11,7 @@ catalog:
   '@filoz/synapse-core': ^0.10.1
   '@biomejs/biome': 2.4.16
   '@types/node': ^26.6.4
-  drizzle-orm: 0.41.0
+  drizzle-orm: 0.45.4
   multiformats: ^14.0.5
   ponder: npm:@rvagg/ponder@0.17.4-filecoin.3
   turbo: ^2.11.7
