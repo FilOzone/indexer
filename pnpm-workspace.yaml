@@ -16,4 +16,4 @@ catalog:
   ponder: npm:@rvagg/ponder@0.17.4-filecoin.3
   turbo: ^2.11.7
   typescript: 6.0.3
-  viem: ^2.50.4
+  viem: ^2.57.5
